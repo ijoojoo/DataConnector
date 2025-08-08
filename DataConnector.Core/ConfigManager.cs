@@ -10,14 +10,16 @@ namespace DataConnector.Core
     public class ConfigManager
     {
         private const string ConfigFileName = "config.json";
+        // Ensure configuration path resolves relative to the application's base directory.
+        private static readonly string ConfigFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ConfigFileName);
 
         public AppConfig Load(Action<string> logCallback)
         {
             try
             {
-                if (File.Exists(ConfigFileName))
+                if (File.Exists(ConfigFilePath))
                 {
-                    string json = File.ReadAllText(ConfigFileName);
+                    string json = File.ReadAllText(ConfigFilePath);
                     var loadedConfig = JsonConvert.DeserializeObject<AppConfig>(json);
                     logCallback("配置加载成功。");
                     return loadedConfig ?? new AppConfig();
@@ -40,8 +42,8 @@ namespace DataConnector.Core
             try
             {
                 string json = JsonConvert.SerializeObject(config, Formatting.Indented);
-                File.WriteAllText(ConfigFileName, json);
-                logCallback("配置已保存到 config.json。");
+                File.WriteAllText(ConfigFilePath, json);
+                logCallback($"配置已保存到 {ConfigFilePath}。");
                 return true; // 返回true表示成功
             }
             catch (Exception ex)
@@ -57,8 +59,8 @@ namespace DataConnector.Core
             try
             {
                 string json = JsonConvert.SerializeObject(config, Formatting.Indented);
-                File.WriteAllText(ConfigFileName, json);
-                logCallback("配置已自动保存到 config.json。");
+                File.WriteAllText(ConfigFilePath, json);
+                logCallback($"配置已自动保存到 {ConfigFilePath}。");
                 return true;
             }
             catch (Exception ex)
