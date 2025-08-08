@@ -8,6 +8,7 @@ namespace DataConnector.Core
     public class SyncStateManager
     {
         private const string StateFileName = "sync_state.json";
+        private readonly string _stateFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, StateFileName);
         private Dictionary<string, DateTime> _syncStates;
 
         public SyncStateManager()
@@ -17,9 +18,9 @@ namespace DataConnector.Core
 
         private void LoadState()
         {
-            if (File.Exists(StateFileName))
+            if (File.Exists(_stateFilePath))
             {
-                string json = File.ReadAllText(StateFileName);
+                string json = File.ReadAllText(_stateFilePath);
                 _syncStates = JsonConvert.DeserializeObject<Dictionary<string, DateTime>>(json) ?? new Dictionary<string, DateTime>();
             }
             else
@@ -31,7 +32,7 @@ namespace DataConnector.Core
         private void SaveState()
         {
             string json = JsonConvert.SerializeObject(_syncStates, Formatting.Indented);
-            File.WriteAllText(StateFileName, json);
+            File.WriteAllText(_stateFilePath, json);
         }
 
         public DateTime GetLastSyncTime(string taskName)
